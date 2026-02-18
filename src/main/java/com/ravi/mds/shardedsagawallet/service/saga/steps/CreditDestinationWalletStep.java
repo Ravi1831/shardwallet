@@ -18,7 +18,6 @@ public class CreditDestinationWalletStep implements SagaStep {
 
     private final WalletRepository walletRepository;
 
-
     @Override
     @Transactional
     public boolean execute(SagaContext context) {
