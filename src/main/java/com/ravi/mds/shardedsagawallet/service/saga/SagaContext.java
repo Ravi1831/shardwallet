@@ -1,5 +1,6 @@
 package com.ravi.mds.shardedsagawallet.service.saga;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -7,8 +8,8 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+@Builder
 @Data
-@NoArgsConstructor
 public class SagaContext {
 
     private Map<String, Object> data;
@@ -37,6 +38,14 @@ public class SagaContext {
         Object value = get(key);
         if (value instanceof  Number val){
             return BigDecimal.valueOf(val.doubleValue());
+        }
+        return null;
+    }
+
+    public String getString(String key){
+        Object value = get(key);
+        if (value instanceof String val){
+            return val;
         }
         return null;
     }
