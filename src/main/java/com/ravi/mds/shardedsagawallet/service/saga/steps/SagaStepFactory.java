@@ -21,6 +21,13 @@ public class SagaStepFactory {
         System.err.println("printing map for sagaStepFactory: "+stepByName);
     }
 
+
+    public static final List<SagaStepNames> transferMoneySagaSteps = List.of(
+            SagaStepNames.CREDIT_SOURCE_WALLET_STEP,
+            SagaStepNames.DEBIT_SOURCE_WALLET_STEP,
+            SagaStepNames.UPDATE_TRANSACTION_STATUS_STEP
+    );
+
     public SagaStepInterface getSagaStep(String stepName){
         SagaStepInterface sagaStep = stepByName.get(stepName);
         if (sagaStep == null){

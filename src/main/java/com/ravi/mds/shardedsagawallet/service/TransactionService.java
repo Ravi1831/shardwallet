@@ -22,4 +22,6 @@ public interface TransactionService {
     public List<Transaction> getTransactionByToWalletId(Long toWalletId);
     public List<Transaction> getTransactionBySagaInstanceId(Long sagaInstanceId);
     public List<Transaction> getTransactionByStatus(TransactionStatus status);
+
+    void updateTransactionWithSagaInstanceId(Long transactionId, Long sagaInstanceId);
 }

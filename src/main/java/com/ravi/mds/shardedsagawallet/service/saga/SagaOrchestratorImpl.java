@@ -179,6 +179,8 @@ public class SagaOrchestratorImpl implements SagaOrchestrator {
         SagaInstance sagaInstance = sagaInstanceRepository.findById(sagaInstanceId).orElseThrow(() -> new RuntimeException("No saga instance found with the id " + sagaInstanceId));
         sagaInstance.markAsFailed();
         sagaInstanceRepository.save(sagaInstance);
+        completeSaga(sagaInstanceId);
+        log.info("Saga {} failed",sagaInstanceId);
     }
 
     @Override
