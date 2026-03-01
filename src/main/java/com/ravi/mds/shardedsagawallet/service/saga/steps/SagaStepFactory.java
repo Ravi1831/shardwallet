@@ -18,20 +18,17 @@ public class SagaStepFactory {
     public SagaStepFactory(List<SagaStepInterface> sagaStep) {
         this.stepByName = sagaStep.stream()
                 .collect(Collectors.toMap(SagaStepInterface::getStepName, Function.identity()));
-        System.err.println("printing map for sagaStepFactory: "+stepByName);
     }
 
-
     public static final List<SagaStepNames> transferMoneySagaSteps = List.of(
-            SagaStepNames.CREDIT_SOURCE_WALLET_STEP,
             SagaStepNames.DEBIT_SOURCE_WALLET_STEP,
-            SagaStepNames.UPDATE_TRANSACTION_STATUS_STEP
-    );
+            SagaStepNames.CREDIT_DESTINATION_WALLET_STEP,
+            SagaStepNames.UPDATE_TRANSACTION_STATUS_STEP);
 
-    public SagaStepInterface getSagaStep(String stepName){
+    public SagaStepInterface getSagaStep(String stepName) {
         SagaStepInterface sagaStep = stepByName.get(stepName);
-        if (sagaStep == null){
-            log.error("Saga step not found for the step name {}",stepName);
+        if (sagaStep == null) {
+            log.error("Saga step not found for the step name {}", stepName);
             throw new IllegalArgumentException("Unknown saga step: " + stepName);
         }
         return sagaStep;

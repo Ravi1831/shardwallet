@@ -16,23 +16,25 @@ import static com.ravi.mds.shardedsagawallet.service.saga.steps.SagaStepNames.UP
 @Slf4j
 public class UpdateTransactionStatus implements SagaStepInterface {
 
-    private TransactionRepository transactionRepository;
+    private final TransactionRepository transactionRepository;
 
     @Override
     public boolean execute(SagaContext context) {
         Long transactionId = context.getLong(TRANSACTION_ID);
-        log.info("updating transaction status for transaction {}",transactionId);
+        log.info("updating transaction status for transaction {}", transactionId);
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new RuntimeException("Transaction not found with id " + transactionId));
-        context.put(ORIGINAL_TRANSACTION_STATUS,transaction.getStatus());
+        context.put(ORIGINAL_TRANSACTION_STATUS, transaction.getStatus());
 
-        /* todo: we have to fetch the transaction status form the target and update it */
-//        context.get("from")
+        /*
+         * todo: we have to fetch the transaction status form the target and update it
+         */
+        // context.get("from")
         transaction.setStatus(TransactionStatus.SUCCESS);
         transactionRepository.save(transaction);
 
-        log.info("Transaction status updated for transaction {}",transactionId);
-        context.put(TRANSACTION_STATUS_AFTER_UPDATE,transaction.getStatus());
+        log.info("Transaction status updated for transaction {}", transactionId);
+        context.put(TRANSACTION_STATUS_AFTER_UPDATE, transaction.getStatus());
         log.info("Update transaction status step executed successfully");
 
         return true;
@@ -41,8 +43,9 @@ public class UpdateTransactionStatus implements SagaStepInterface {
     @Override
     public boolean compensate(SagaContext context) {
         Long transactionId = context.getLong(TRANSACTION_ID);
-        TransactionStatus originalTransactionStatus = TransactionStatus.valueOf(context.getString(ORIGINAL_TRANSACTION_STATUS));
-        log.info("Compensating transaction status for transaction {}",transactionId);
+        TransactionStatus originalTransactionStatus = TransactionStatus
+                .valueOf(context.getString(ORIGINAL_TRANSACTION_STATUS));
+        log.info("Compensating transaction status for transaction {}", transactionId);
 
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new RuntimeException("Transaction not found with id " + transactionId));
@@ -50,7 +53,7 @@ public class UpdateTransactionStatus implements SagaStepInterface {
         transaction.setStatus(originalTransactionStatus);
         transactionRepository.save(transaction);
 
-        log.info("Transaction status compensated for transaction {}",transactionId);
+        log.info("Transaction status compensated for transaction {}", transactionId);
 
         return true;
     }

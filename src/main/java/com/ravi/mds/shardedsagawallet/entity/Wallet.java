@@ -1,5 +1,7 @@
 package com.ravi.mds.shardedsagawallet.entity;
 
+import com.ravi.mds.shardedsagawallet.exception.InsufficientBalanceException;
+import com.ravi.mds.shardedsagawallet.exception.WalletInactiveException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -17,7 +19,7 @@ import java.math.BigDecimal;
 @Table(name = "wallet")
 public class Wallet extends BaseEntity {
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", nullable = false, updatable = false)
     private Long userId;
 
     @Column(name = "is_active", nullable = false)
@@ -28,13 +30,13 @@ public class Wallet extends BaseEntity {
     private BigDecimal balance = BigDecimal.ZERO;
 
     public boolean hasSufficientBalance(BigDecimal amount) {
-        return balance.compareTo(amount) >= 0;
+        return balance.compareTo(amount) < 0;
     }
 
     public void debit(BigDecimal amount) {
         validateActive();
-        if (!hasSufficientBalance(amount)) {
-            throw new IllegalArgumentException("Insufficient balance");
+        if (hasSufficientBalance(amount)) {
+            throw new InsufficientBalanceException("Insufficient balance to complete the debit");
         }
         this.balance = balance.subtract(amount);
     }
@@ -46,7 +48,7 @@ public class Wallet extends BaseEntity {
 
     private void validateActive() {
         if (Boolean.FALSE.equals(this.isActive)) {
-            throw new IllegalStateException("Wallet is inactive");
+            throw new WalletInactiveException("Wallet is inactive. Please reactivate it");
         }
     }
 

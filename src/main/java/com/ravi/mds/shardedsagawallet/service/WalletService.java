@@ -12,7 +12,7 @@ public interface WalletService {
 
     public Wallet getWalletById(Long id);
 
-    public List<Wallet> getWalletByUserId(Long userId);
+    public Wallet getWalletByUserId(Long userId);
 
     public void debit(Long walletId, BigDecimal amount);
 

@@ -1,6 +1,7 @@
 package com.ravi.mds.shardedsagawallet.service.saga.steps;
 
 import com.ravi.mds.shardedsagawallet.entity.Wallet;
+import com.ravi.mds.shardedsagawallet.exception.WalletNotFoundException;
 import com.ravi.mds.shardedsagawallet.repository.WalletRepository;
 import com.ravi.mds.shardedsagawallet.service.saga.SagaContext;
 import com.ravi.mds.shardedsagawallet.service.saga.SagaStepInterface;
@@ -22,21 +23,22 @@ public class DebitSourceWalletStep implements SagaStepInterface {
     private final WalletRepository walletRepository;
 
     @Override
+    @Transactional
     public boolean execute(SagaContext context) {
-    Long fromWalletId = context.getLong(FROM_WALLET_ID);
+        Long fromWalletId = context.getLong(FROM_WALLET_ID);
         BigDecimal amount = context.getBigDecimal(AMOUNT);
-        log.info("Debiting source wallet {} with amount {}", fromWalletId,amount);
+        log.info("Debiting source wallet {} with amount {}", fromWalletId, amount);
 
         Wallet wallet = walletRepository.findByIdWithLock(fromWalletId)
-                .orElseThrow(() -> new RuntimeException("Wallet not found with id " + fromWalletId));
+                .orElseThrow(() -> new WalletNotFoundException("Wallet not found with id " + fromWalletId));
 
-        log.info("Wallet fetched with balance {}",wallet.getBalance());
-        context.put(ORIGINAL_SOURCE_WALLET_BALANCE,wallet.getBalance());
+        log.info("Wallet fetched with balance {}", wallet.getBalance());
+        context.put(ORIGINAL_SOURCE_WALLET_BALANCE, wallet.getBalance());
 
         wallet.debit(amount);
         walletRepository.save(wallet);
-        log.info("wallet saved with balance {}",wallet.getBalance());
-        context.put(SOURCE_WALLET_BALANCE_AFTER_DEBIT,wallet.getBalance());
+        log.info("wallet saved with balance {}", wallet.getBalance());
+        context.put(SOURCE_WALLET_BALANCE_AFTER_DEBIT, wallet.getBalance());
         return true;
     }
 
@@ -45,14 +47,14 @@ public class DebitSourceWalletStep implements SagaStepInterface {
     public boolean compensate(SagaContext context) {
         Long fromWalletId = context.getLong(FROM_WALLET_ID);
         BigDecimal amount = context.getBigDecimal(AMOUNT);
-        log.info("Compensating source wallet {} with amount {}", fromWalletId,amount);
+        log.info("Compensating source wallet {} with amount {}", fromWalletId, amount);
         Wallet wallet = walletRepository.findByIdWithLock(fromWalletId)
-                .orElseThrow(() -> new RuntimeException("Wallet not found with id " + fromWalletId));
+                .orElseThrow(() -> new WalletNotFoundException("Wallet not found with id " + fromWalletId));
 
         wallet.credit(amount);
         walletRepository.save(wallet);
-        log.info("Wallet saved with balance {}",wallet.getBalance());
-        context.put(SOURCE_WALLET_BALANCE_AFTER_CREDIT_COMPENSATION,wallet.getBalance());
+        log.info("Wallet saved with balance {}", wallet.getBalance());
+        context.put(SOURCE_WALLET_BALANCE_AFTER_CREDIT_COMPENSATION, wallet.getBalance());
         log.info("Compensating source wallet step executed successfully");
         return true;
     }

@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 import static com.ravi.mds.shardedsagawallet.service.saga.steps.SagaStepFactory.transferMoneySagaSteps;
@@ -17,12 +16,13 @@ import static com.ravi.mds.shardedsagawallet.service.saga.steps.SagaStepFactory.
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class TransferSagaServiceImpl {
+public class TransferSagaServiceImpl implements TransferSagaService{
 
     private final TransactionService transactionService;
     private final SagaOrchestrator sagaOrchestrator;
 
 
+    @Override
     public Long initiateTransaction(
             Long fromWalletId,
             Long toWalletId,
@@ -48,6 +48,7 @@ public class TransferSagaServiceImpl {
         return sagaInstanceId;
     }
 
+    @Override
     public void executeTransferSaga(Long sagaInstanceId){
         log.info("Executing transfer saga with id {}",sagaInstanceId);
 
