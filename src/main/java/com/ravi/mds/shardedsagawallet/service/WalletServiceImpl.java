@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 
 @Service
@@ -70,7 +69,7 @@ public class WalletServiceImpl implements WalletService {
         if (Boolean.FALSE.equals(wallet.getIsActive())) {
             throw new WalletInactiveException("Wallet is inactive please reactive it");
         }
-        if (wallet.hasSufficientBalance(amount)) {
+        if (!wallet.hasSufficientBalance(amount)) {
             throw new InsufficientBalanceException("Insufficient balance to complete the debit");
         }
         walletRepository.updateBalanceByUserId(userId, wallet.getBalance().subtract(amount));
